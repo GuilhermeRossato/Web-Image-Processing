@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Digital Zoom - Guilherme Rossato</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link href="style.css" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	</head>
+	<body style="background-color:#EEE;color:#333;width:100vw;height:100vh;margin:0px;padding:0px;overflow:hidden;cursor:default;">
+		<div id="loading-screen" class="wrapper">
+			<div>
+				<span>Carregando</span>
+			</div>
+		</div>
+		<div id="init-message" class="wrapper" style="display:none">
+			<div id="init-div">
+				<span>Arraste uma imagem aqui</span>
+				<span>Ou clique aqui para carregar de seu computador</span>
+				<input type="file" id="file-selector" name="image-selector" accept="image/*"/>
+			</div>
+		</div>
+		<div id="drop-zone" class="wrapper" style="display:none">
+			<div>
+				<span>Solte a imagem aqui para utiliza-la</span>
+			</div>
+		</div>
+		<div id="canvas-base" style="display:none">
+			<div id="viewport">
+				<div class="positioner">
+					<div id="tools">
+						<div id="tools-title">
+							<h3>Ferramentas</h3>
+							<span id="button-switch" class="switch-right">arrow_forward</span>
+						</div>
+						<div id="method-list">
+							<h4>Métodos</h4>
+							<input type="button" value="Vizinho mais próximo" disabled/>
+							<div class="separator"></div>
+							<input type="button" value="Bicúbico"/>
+							<div class="separator"></div>
+							<input type="button" value="Arredores com Peso"/>
+							<div class="separator"></div>
+							<input type="button" value="Média dupla"/>
+							<div class="separator"></div>
+						</div>
+						<div id="size-list">
+							<h4>Tamanhos Definidos</h4>
+							<input type="button" value="100%" disabled/>
+							<div class="separator"></div>
+							<input type="button" value="150%"/>
+							<div class="separator"></div>
+							<input type="button" value="200%"/>
+							<div class="separator"></div>
+							<input type="button" value="500%"/>
+							<div class="separator"></div>
+						</div>
+						<div id="magnifier-wrapper">
+							<h4>Mouse Pixels</h4>
+							<canvas id="magnifier-canvas"></canvas>
+							<div class="canvas-cross-vertical"></div>
+							<div class="canvas-cross-horizontal"></div>
+						</div>
+					</div>
+				</div>
+				<div class="positioner">
+					<h1 id="image-title"><span class="selectable"></span></h1>
+				</div>
+				<div class="positioner">
+					<h2 id="image-footer"><span class="selectable"></span></h2>
+				</div>
+				<div class="positioner">
+					<div id="scaler-1" class="scaler-button"><div>chevron_right</div></div>
+				</div>
+				<div class="positioner">
+					<div id="scaler-2" class="scaler-button"><div>chevron_right</div></div>
+				</div>
+				<div class="positioner">
+					<div id="scaler-3" class="scaler-button"><div>chevron_right</div></div>
+				</div>
+				<div class="positioner">
+					<div id="scaler-4" class="scaler-button"><div>chevron_right</div></div>
+				</div>
+				<div class="positioner">
+					<div id="scaler-5" class="scaler-button"><div>chevron_right</div></div>
+				</div>
+				<div class="positioner">
+					<canvas id="canvas"></canvas>
+				</div>
+			</div>
+			<div class="positioner">
+				<div id="top-scroll" class="scroll"><div class="scroll-button"></div></div>
+			</div>
+			<div class="positioner">
+				<div id="right-scroll" class="scroll"><div class="scroll-button"></div></div>
+			</div>
+			<div class="positioner">
+				<div id="bottom-scroll" class="scroll"><div class="scroll-button"></div></div>
+			</div>
+			<div class="positioner">
+				<div id="left-scroll" class="scroll"><div class="scroll-button"></div></div>
+			</div>
+		</div>
+		<div id="error-message" class="wrapper" style="display:none">
+			<div>
+				<span id="error-label-1">Ocorreu um Erro</span>
+				<span id="error-label-2">Mensagem de erro</span>
+				<span id="error-label-3">Considere a utilização de um browser mais moderno para acessar esta aplicação</span>
+			</div>
+		</div>
+		<div id="disclaimer">Este aplicativo foi desenvolvido para a disciplina de Métodos Computacionais por Guilherme Rossato em Junho de 2017</div>
+		<div id="catch-panning" class="mouse-catch" style="display: none"></div>
+		<script src="Classes/DigitalImage.js"></script>
+		<script src="Classes/PixelArea.js"></script>
+		<script src="Classes/GraphicalUserInterface.js"></script>
+		<script src="Classes/StateMachine.js"></script>
+		<script src="simplifier.js"></script>
+		<script src="fileSelect.js"></script>
+		<script src="errorCheck.js"></script>
+		<script src="cachedImage.js"></script>
+		<script src="script.js"></script>
+	</body>
+</html>
