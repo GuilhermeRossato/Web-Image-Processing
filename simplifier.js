@@ -72,6 +72,12 @@ function createWrapperForObject(element) {
 			this._real_element.style.width = `${width}px`;
 			this._real_element.style.height = `${height}px`;
 		},
+		getWidth: function() {
+			return this._real_element.width;
+		},
+		getHeight: function() {
+			return this._real_element.height;
+		},
 		setPosition: function(x, y) {
 			this._real_element.style.left = `${x}px`;
 			this._real_element.style.top = `${y}px`;
