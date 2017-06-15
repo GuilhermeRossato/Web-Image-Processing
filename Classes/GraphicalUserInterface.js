@@ -1,9 +1,7 @@
 function GraphicalUserInterface() {
 	this.getElements();
-	this.offset = {
-		x: 0,
-		y: 0
-	}
+	this.offsetX = 0;
+	this.offsetY = 0;
 	this.scale = {
 		x: 1,
 		y: 1
@@ -12,6 +10,8 @@ function GraphicalUserInterface() {
 	this.magnifierFollowMouse = false;
 	this.lastMouseX = 0;
 	this.lastMouseY = 0;
+	this.lastGlobalX = 0;
+	this.lastGlobalY = 0;
 	StateMachine.call(this, {
 		state: "init",
 		transitions: [{
@@ -24,7 +24,20 @@ function GraphicalUserInterface() {
 				this.startDraggingScreen();
 			}
 		}, {
+			last: "idle",
+			next: "panning-click",
+			event: function() {
+				this.startDraggingScreen();
+				//this.operation.elements.catchPanning.setStyleAttribute("cursor", "default");
+			}
+		}, {
 			last: "panning",
+			next: "idle",
+			event: function() {
+				this.stopDraggingScreen();
+			}
+		}, {
+			last: "panning-click",
 			next: "idle",
 			event: function() {
 				this.stopDraggingScreen();
@@ -58,7 +71,34 @@ GraphicalUserInterface.prototype = {
 		this.operation.buttons.sizes.forEach(btn => btn.setActiveIf(pressedBtn !== btn));
 	},
 	onMainCanvasMouseMove: function(canvas, event) {
-		this.updateMagnifier(canvas, event.clientX-this.offset.x, event.clientY-this.offset.y);
+		this.updateMagnifier(canvas, event.clientX-this.offsetX, event.clientY-this.offsetY);
+	},
+	onPanningMouseMove: function(event) {
+		this.offsetX = this.startPanning.offsetX + (event.clientX - this.startPanning.mouseX);
+		this.offsetY = this.startPanning.offsetY + (event.clientY - this.startPanning.mouseY);
+		this.updateOffset();
+	},
+	onMainMouseMove: function(event) {
+		if (this.state === "panning" || this.state === "panning-click") {
+			this.onPanningMouseMove(event);
+		} else {
+			this.lastGlobalX = event.clientX;
+			this.lastGlobalY = event.clientY;
+		}
+	},
+	onMainMouseDown: function(event) {
+		let rx = event.clientX - this.offsetX;
+		let ry = event.clientY - this.offsetY;
+		let width = this.operation.elements.canvas.getWidth();
+		let height = this.operation.elements.canvas.getHeight();
+		if (rx > 1 && ry > 1 && rx < width-1 && ry < height-1 && this.state === "idle") {
+			this.state = "panning-click";
+		}
+	},
+	onMainMouseUp: function(event) {
+		if (this.state === "panning-click") {
+			this.state = "idle";
+		}
 	},
 	onKeyDown: function(event) {
 		if (event.code === "ControlLeft") {
@@ -78,13 +118,9 @@ GraphicalUserInterface.prototype = {
 			}
 		}
 	},
-	onMainMouseMove: function(event) {
-		this.lastGlobalX = event.clientX;
-		this.lastGlobalY = event.clientY;
-	},
 	/* Basic Methods */
 	updateOffset: function() {
-		this.operation.elements.viewport.setPosition(this.offset.x, this.offset.y);
+		this.operation.elements.viewport.setPosition(this.offsetX, this.offsetY);
 	},
 	updateToolSide: function() {
 		let width = this.image.width - 15;
@@ -142,6 +178,14 @@ GraphicalUserInterface.prototype = {
 	startDraggingScreen: function() {
 		if (this.draggingScreen)
 			return
+		this.startPanningX = this.lastMouseX;
+		this.startPanningy = this.lastMouseY;
+		this.startPanning = {
+			mouseX : this.lastGlobalX,
+			mouseY : this.lastGlobalY,
+			offsetX : this.offsetX,
+			offsetY : this.offsetY
+		}
 		this.draggingScreen = true;
 		this.operation.elements.catchPanning.show();
 		this.operation.elements.catchPanning.setStyleAttribute("cursor", "move");
@@ -214,17 +258,20 @@ GraphicalUserInterface.prototype = {
 		this.dropZone.hide();
 		this.initMessage.hide();
 		this.canvasBase.show("flex");
-		this.offset.x = window.innerWidth/2 - image.width/2;
-		this.offset.y = window.innerHeight/2 - Math.max(image.height,542)/2;
+		this.offsetX = window.innerWidth/2 - image.width/2;
+		this.offsetY = window.innerHeight/2 - Math.max(image.height,542)/2;
 		this.updateOffset();
 		this.operation.elements.magnifierCanvas.setSize(180, 180, 180/this.magnify, 180/this.magnify);
 		this.operation.buttons.switch.setEvent("click", this.onSwitchClick.bind(this));
 		this.operation.buttons.methods.forEach(btn => btn.setEvent("click", this.onMethodButtonClick.bind(this, btn)));
 		this.operation.buttons.sizes.forEach(btn => btn.setEvent("click", this.onSizeButtonPress.bind(this, btn)));
 		this.operation.elements.canvas.setEvent("mousemove", this.onMainCanvasMouseMove.bind(this, this.operation.elements.canvas), false);
+		this.operation.elements.canvas.setStyleAttribute("cursor", "pointer");
 		window.addEventListener("keydown", this.onKeyDown.bind(this));
 		window.addEventListener("keyup", this.onKeyUp.bind(this));
 		window.addEventListener("mousemove", this.onMainMouseMove.bind(this));
+		window.addEventListener("mousedown", this.onMainMouseDown.bind(this));
+		window.addEventListener("mouseup", this.onMainMouseUp.bind(this));
 		this.toolsSide = "left";
 		this.onChangeImage(image);
 		this.updateToolSide();
