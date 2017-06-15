@@ -4,7 +4,7 @@
 
 let gui = new GraphicalUserInterface();
 
-let application = new StateMachine({
+let appLoader = new StateMachine({
 	state: "loading",
 	transitions: [{
 		last: "loading",
@@ -47,7 +47,7 @@ let application = new StateMachine({
 
 function onImageSelect(image) {
 	lastLoadedImage = image;
-	if (application.state === "init") {
-		application.state = "operating";
+	if (appLoader.state === "init") {
+		appLoader.state = "operating";
 	}
 }

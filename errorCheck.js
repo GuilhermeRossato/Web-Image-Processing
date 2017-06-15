@@ -41,7 +41,7 @@ function checkErrorMessages() {
 		return;
 	}
 
-	application.state = "init";
+	appLoader.state = "init";
 	onImageSelect(lastLoadedImage) // debug;
 }
 

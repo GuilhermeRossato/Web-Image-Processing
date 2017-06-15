@@ -18,14 +18,14 @@ function onFileHoverTimer() {
 }
 
 function goBackToInit() {
-	if (application.state === "hovering")
-		application.state = "init";
+	if (appLoader.state === "hovering")
+		appLoader.state = "init";
 }
 
 function onDragOver(ev) {
 	ev.preventDefault();
-	if (application.state === "init") {
-		application.state = "hovering";
+	if (appLoader.state === "init") {
+		appLoader.state = "hovering";
 		if (fileHoverTimer)
 			clearInterval(fileHoverTimer);
 		fileHoverTimer = setInterval(onFileHoverTimer, 500);
@@ -72,7 +72,7 @@ function getImageFromFile(file, callback) {
 function onManualFileSelect(ev) {
 	ev.stopPropagation();
 	ev.preventDefault();
-	if (application.state === "init") {
+	if (appLoader.state === "init") {
 		getImageFromFile(ev.dataTransfer.files[0]).then(onImageSelect);
 	}
 }
