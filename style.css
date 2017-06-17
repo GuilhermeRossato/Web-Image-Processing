@@ -46,6 +46,10 @@ canvas {
 	z-index: 1;
 }
 
+#image-title span {
+	margin-left: 10px;
+}
+
 span.selectable {
 	cursor: text;
 }
@@ -391,7 +395,7 @@ span.selectable {
 	margin:0;
 	z-index: 20;
 }
-
+/*
 .scroll-button {
 	position:relative;
 	top:2px;
@@ -404,4 +408,4 @@ span.selectable {
 	-khtml-user-select: none;
 	-webkit-user-select: none;
 	-o-user-select: none;
-}
+}*/
