@@ -78,7 +78,32 @@ GraphicalUserInterface.prototype = {
 		this.offsetY = this.startPanning.offsetY + (event.clientY - this.startPanning.mouseY);
 		this.updateOffset();
 	},
+	onMainMouseDown: function(event) {
+		if (event.type === "touchstart") {
+			event.clientX = event.touches[0].clientX;
+			event.clientY = event.touches[0].clientY;
+			this.lastGlobalX = event.clientX;
+			this.lastGlobalY = event.clientY;
+			event.preventDefault();
+		}
+		console.log(event.type, event.clientX, event.clientY);
+		if (this.state === "idle") {
+			let rx = event.clientX - this.offsetX;
+			let ry = event.clientY - this.offsetY;
+			let width = this.realCanvasWidth;
+			let height = this.realCanvasHeight;
+			if (rx > 1 && ry > 1 && rx < width-1 && ry < height-1) {
+				this.state = "panning-click";
+			}
+		}
+	},
 	onMainMouseMove: function(event) {
+		if (event.type === "touchmove") {
+			event.clientX = event.touches[0].clientX;
+			event.clientY = event.touches[0].clientY;
+			event.preventDefault();
+		}
+		//console.log(event.type, event.clientX, event.clientY);
 		if (this.state === "panning" || this.state === "panning-click") {
 			this.onPanningMouseMove(event);
 		} else {
@@ -86,16 +111,10 @@ GraphicalUserInterface.prototype = {
 			this.lastGlobalY = event.clientY;
 		}
 	},
-	onMainMouseDown: function(event) {
-		let rx = event.clientX - this.offsetX;
-		let ry = event.clientY - this.offsetY;
-		let width = this.operation.elements.canvas.getWidth();
-		let height = this.operation.elements.canvas.getHeight();
-		if (rx > 1 && ry > 1 && rx < width-1 && ry < height-1 && this.state === "idle") {
-			this.state = "panning-click";
-		}
-	},
 	onMainMouseUp: function(event) {
+		if (event.type === "touchend") {
+			event.preventDefault();
+		}
 		if (this.state === "panning-click") {
 			this.state = "idle";
 		}
@@ -155,8 +174,6 @@ GraphicalUserInterface.prototype = {
 			content = (`Tamanho da Imagem: ${image.width}x${image.height} - Escala: (${application.scale.x}, ${application.scale.y}) - Tamanho Final: ${(image.width * application.scale.x)}x${(image.height * application.scale.y)}`);
 		}
 		this.operation.elements.footer.getChildren(0).setContent(content);
-		this.operation.elements.footer.setPosition(0, image.height);
-		this.operation.elements.footer.setSize(image.width - 20, 15);
 	},
 	updateMagnifier: function(canvas, mouseX, mouseY) {
 		let imageSize = 180/this.magnify
@@ -178,8 +195,6 @@ GraphicalUserInterface.prototype = {
 	startDraggingScreen: function() {
 		if (this.draggingScreen)
 			return
-		this.startPanningX = this.lastMouseX;
-		this.startPanningy = this.lastMouseY;
 		this.startPanning = {
 			mouseX : this.lastGlobalX,
 			mouseY : this.lastGlobalY,
@@ -214,8 +229,22 @@ GraphicalUserInterface.prototype = {
 	onChangeImage: function(image) {
 		this.image = new DigitalImage(this.operation.elements.canvas, image, image.width, image.height);
 		this.operation.elements.title.getChildren(0).setContent(`${image.fileName} (${bytesToString(image.size)}) (${separateDigits((image.width*image.height).toString())} pixels)`);
-		this.operation.elements.title.setSize(image.width-20, 15);
+		this.updateImageSize();
+	},
+	setScale: function(x, y) {
+		this.scale.x = x;
+		this.scale.y = y;
+		this.image.setScale(x, y);
+		this.updateImageSize();
+	},
+	updateImageSize: function() {
+		this.realCanvasWidth = this.operation.elements.canvas.getWidth();
+		this.realCanvasHeight = this.operation.elements.canvas.getHeight();
+		this.operation.elements.title.setSize(this.realCanvasWidth-20, 15);
+		this.operation.elements.footer.setPosition(0, this.realCanvasHeight);
+		this.operation.elements.footer.setSize(this.realCanvasWidth - 20, 15);
 		this.updateFooterContent();
+		this.updateToolSide();
 	},
 	onInit:function() {
 		this.operation = {
@@ -269,12 +298,14 @@ GraphicalUserInterface.prototype = {
 		this.operation.elements.canvas.setStyleAttribute("cursor", "pointer");
 		window.addEventListener("keydown", this.onKeyDown.bind(this));
 		window.addEventListener("keyup", this.onKeyUp.bind(this));
-		window.addEventListener("mousemove", this.onMainMouseMove.bind(this));
 		window.addEventListener("mousedown", this.onMainMouseDown.bind(this));
+		window.addEventListener("mousemove", this.onMainMouseMove.bind(this));
 		window.addEventListener("mouseup", this.onMainMouseUp.bind(this));
+		window.addEventListener("touchstart", this.onMainMouseDown.bind(this), {passive:false});
+		window.addEventListener("touchmove", this.onMainMouseMove.bind(this), {passive:false});
+		window.addEventListener("touchend", this.onMainMouseUp.bind(this), {passive:false});
 		this.toolsSide = "left";
 		this.onChangeImage(image);
-		this.updateToolSide();
 		this.state = "idle";
 		this.onStartOperating = undefined;
 	},
