@@ -74,13 +74,38 @@ GraphicalUserInterface.prototype = {
 		} else {
 			this.toolsSide = "left";
 		}
-		this.updateToolSide();
+		this.updateToolSide(this.realCanvasWidth, this.realCanvasHeight);
 	},
-	onMethodButtonClick: function(pressedBtn, event) {
+	onMethodButtonPress: function(pressedBtn, event) {
 		this.operation.buttons.methods.forEach(btn => btn.setActiveIf(pressedBtn !== btn));
+		ZoomController.setZoomMode(pressedBtn.getLabel());
+		ZoomController.applyZoom(this.image, this.realCanvasWidth, this.realCanvasHeight);
 	},
 	onSizeButtonPress: function(pressedBtn, event) {
-		this.operation.buttons.sizes.forEach(btn => btn.setActiveIf(pressedBtn !== btn));
+		this.operation.buttons.sizes.forEach(btn => btn.setActiveIf(true));
+		let label = pressedBtn.getLabel();
+		let labelEnd = label.substr(label.length - 4);
+		let newScale = parseInt(labelEnd);
+		if (isNaN(newScale))
+			newScale = 1;
+		else
+			newScale = newScale / 100;
+		if (label[0] === "x") {
+			this.scale.x = newScale;
+		} else if (label[0] === "y") {
+			this.scale.y = newScale;
+		} else {
+			this.scale.x = newScale;
+			this.scale.y = newScale;
+		}
+		if (ZoomController.getZoomMode() === undefined || (this.scale.x <= 1 && this.scale.y <= 1)) {
+			this.image.setScale(this.scale.x, this.scale.y);
+			this.updateImageSize();
+		} else {
+			this.image.setScale(this.scale.x, this.scale.y, false);
+			this.updateImageSize();
+			ZoomController.applyZoom(this.image, this.realCanvasWidth, this.realCanvasHeight);
+		}
 	},
 	onMainCanvasMouseMove: function(canvas, event) {
 		this.updateMagnifier(canvas, event.clientX-this.offsetX, event.clientY-this.offsetY);
@@ -97,8 +122,18 @@ GraphicalUserInterface.prototype = {
 			this.offsetY = this.startCatch.offsetY + distY;
 			this.updateOffset();
 			newHeight = this.startCatch.cHeight - distY;
-		} else if (this.resizeIndex === 4) {
-			newHeight = this.startCatch.cHeight + distY;
+		} else if (this.resizeIndex === 1 && this.toolsSide === "left") {
+			this.offsetY = this.startCatch.offsetY + distY;
+			this.updateOffset();
+			newHeight = this.startCatch.cHeight - distY;
+			newWidth = this.startCatch.cWidth + distX;
+		} else if (this.resizeIndex === 1 && this.toolsSide === "right") {
+			this.offsetY = this.startCatch.offsetY + distY;
+			this.updateOffset();
+			newHeight = this.startCatch.cHeight - distY;
+			this.offsetX = this.startCatch.offsetX + distX;
+			this.updateOffset();
+			newWidth = this.startCatch.cWidth - distX;
 		} else if (this.resizeIndex === 2 && this.toolsSide === "left") {
 			newWidth = this.startCatch.cWidth + distX;
 		} else if (this.resizeIndex === 2 && this.toolsSide === "right") {
@@ -108,13 +143,26 @@ GraphicalUserInterface.prototype = {
 		} else if (this.resizeIndex === 3 && this.toolsSide === "left") {
 			newWidth = this.startCatch.cWidth + distX;
 			newHeight = this.startCatch.cHeight + distY;
+		} else if (this.resizeIndex === 3 && this.toolsSide === "right") {
+			this.offsetX = this.startCatch.offsetX + distX;
+			this.updateOffset();
+			newWidth = this.startCatch.cWidth - distX;
+			newHeight = this.startCatch.cHeight + distY;
+		} else if (this.resizeIndex === 4) {
+			newHeight = this.startCatch.cHeight + distY;
 		}
-		if (newWidth != undefined && newHeight != undefined)
+		if (newWidth != undefined && newHeight != undefined) {
+			this.scale.x = newWidth/this.image.width;
+			this.scale.y = newHeight/this.image.height;
 			this.image.setCanvasSize(newWidth, newHeight);
-		else if (newWidth != undefined)
+		} else if (newWidth != undefined) {
+			this.scale.x = newWidth/this.image.width;
 			this.image.setCanvasSize(newWidth, this.startCatch.cHeight);
-		else if (newHeight != undefined)
+		} else if (newHeight != undefined) {
+			this.scale.y = newHeight/this.image.height;
 			this.image.setCanvasSize(this.startCatch.cWidth, newHeight);
+		}
+		this.updateImageSize();
 	},
 	onMainMouseDown: function(event) {
 		if (event.type === "touchstart") {
@@ -179,6 +227,9 @@ GraphicalUserInterface.prototype = {
 			if (this.state === "idle") {
 				this.state = "panning";
 			}
+		} else if (event.code === "KeyZ") {
+			this.extremeZoom = this.extremeZoom?false:true;
+			this.updateMagnifier(this.operation.elements.canvas, this.lastMouseX, this.lastMouseY);
 		}
 	},
 	onKeyUp: function(event) {
@@ -194,12 +245,17 @@ GraphicalUserInterface.prototype = {
 	updateOffset: function() {
 		this.operation.elements.viewport.setPosition(this.offsetX, this.offsetY);
 	},
-	updateToolSide: function() {
-		let width = this.realCanvasWidth - 15;
-		let height = this.realCanvasHeight - 15;
+	updateToolSide: function(width, height) {
 		let scalers = this.operation.buttons.scalers;
 		let transformList;
 		let positionArgs;
+		if (width < 30 || height < 30) {
+			scalers.forEach(scaler => scaler.setStyleAttribute("display", "none"));
+		} else {
+			scalers.forEach(scaler => scaler.setStyleAttribute("display", "block"));
+		}
+		width -= 15;
+		height -= 15;
 		if (this.toolsSide === "right") {
 			transformList = [-90, -135, -180, 135, 90];
 			positionArgs = [[width / 2, -15], [-15, -15], [-15, height/2], [-15, height], [width/2, height]];
@@ -210,7 +266,7 @@ GraphicalUserInterface.prototype = {
 		transformList.forEach((transf,i) => scalers[i].getChildren(0).setTransform(`rotate(${transf}deg)`));
 		positionArgs.forEach((args,i) => scalers[i].setPosition(...args));
 		this.operation.elements.tools.setStyleAttribute("marginLeft", (this.toolsSide === "right")?"":"-200px");
-		this.operation.elements.tools.setPosition((this.toolsSide === "right")?this.image.width:0, 0);
+		this.operation.elements.tools.setPosition((this.toolsSide === "right")?width+15:0, 0);
 		this.operation.buttons.switch.setClass((this.toolsSide === "right")?"switch-left":"switch-right");
 		this.operation.buttons.switch.setContent((this.toolsSide === "right")?"arrow_backwards":"arrow_forward");
 	},
@@ -221,14 +277,15 @@ GraphicalUserInterface.prototype = {
 			if (this.scale.x === 1) {
 				content = (`Tamanho da Imagem: ${image.width}x${image.height}`);
 			} else {
-				content = (`Tamanho da Imagem: ${image.width}x${image.height} - Escala: ${application.scale.x} - Tamanho Final: ${(image.width * application.scale.x)}x${(image.height * application.scale.y)}`);
+				content = (`Tamanho da Imagem: ${image.width}x${image.height} - Escala: ${this.scale.x.toString().substr(0,6)} - Tamanho Final: ${(image.width * this.scale.x)}x${(image.height * this.scale.y)}`);
 			}
 		} else {
-			content = (`Tamanho da Imagem: ${image.width}x${image.height} - Escala: (${application.scale.x}, ${application.scale.y}) - Tamanho Final: ${(image.width * application.scale.x)}x${(image.height * application.scale.y)}`);
+			content = (`Tamanho da Imagem: ${image.width}x${image.height} - Escala: (${this.scale.x.toString().substr(0,5)}, ${this.scale.y.toString().substr(0,5)}) - Tamanho Final: ${(image.width * this.scale.x)}x${(image.height * this.scale.y)}`);
 		}
 		this.operation.elements.footer.getChildren(0).setContent(content);
 	},
 	updateMagnifier: function(canvas, mouseX, mouseY) {
+		this.magnify = this.extremeZoom?16:4;
 		let imageSize = 180/this.magnify
 		let area = {
 			x: (mouseX-imageSize/2)|0,
@@ -282,10 +339,11 @@ GraphicalUserInterface.prototype = {
 	},
 	stopResizing: function() {
 		this.operation.elements.catchPanning.hide();
+		ZoomController.applyZoom(this.image, this.realCanvasWidth, this.realCanvasHeight);
 	},
 	startFollowingMouse: function() {
 		if (this.magnifierFollowMouse) {
-			console.warn("Unexpected function call");
+			console.log("Unexpected function call");
 			return
 		}
 		this.magnifierFollowMouse = true;
@@ -294,7 +352,7 @@ GraphicalUserInterface.prototype = {
 	},
 	stopFollowingMouse: function() {
 		if (!this.magnifierFollowMouse) {
-			console.warn("Unexpected function call");
+			console.log("Unexpected function call");
 			return
 		}
 		this.magnifierFollowMouse = false;
@@ -320,7 +378,7 @@ GraphicalUserInterface.prototype = {
 		this.operation.elements.footer.setPosition(0, this.realCanvasHeight);
 		this.operation.elements.footer.setSize(this.realCanvasWidth - 20, 15);
 		this.updateFooterContent();
-		this.updateToolSide();
+		this.updateToolSide(this.realCanvasWidth, this.realCanvasHeight);
 	},
 	onInit:function() {
 		this.operation = {
@@ -364,7 +422,7 @@ GraphicalUserInterface.prototype = {
 		this.updateOffset();
 		this.operation.elements.magnifierCanvas.setSize(180, 180, 180/this.magnify, 180/this.magnify);
 		this.operation.buttons.switch.setEvent("click", this.onSwitchClick.bind(this));
-		this.operation.buttons.methods.forEach(btn => btn.setEvent("click", this.onMethodButtonClick.bind(this, btn)));
+		this.operation.buttons.methods.forEach(btn => btn.setEvent("click", this.onMethodButtonPress.bind(this, btn)));
 		this.operation.buttons.sizes.forEach(btn => btn.setEvent("click", this.onSizeButtonPress.bind(this, btn)));
 		this.operation.elements.canvas.setEvent("mousemove", this.onMainCanvasMouseMove.bind(this, this.operation.elements.canvas), false);
 		this.operation.elements.canvas.setStyleAttribute("cursor", "pointer");

@@ -188,16 +188,31 @@ span.selectable {
 	cursor:text;
 }
 
+#canvas-base #method-list {
+	margin: 0 10px;
+}
+
 #canvas-base #method-list input[type="button"] {
 	width: 180px;
-	margin-left: 10px;
 	padding: 2px 10px;
 }
 
-#canvas-base #size-list input[type="button"] {
-	width: 180px;
+#canvas-base #size-list {
 	margin-left: 10px;
-	padding: 2px 10px;
+}
+
+#canvas-base #size-list span.axis {
+	display: inline-block;
+	width: 56px;
+	text-align: center;
+	margin-bottom:5px;
+}
+
+#canvas-base #size-list input[type="button"] {
+	display: inline-block;
+	width: 56px;
+	margin: 0 0 10px 0px;
+	padding: 2px;
 }
 
 #canvas-base #method-list .separator, #canvas-base #size-list .separator {
@@ -295,6 +310,7 @@ span.selectable {
 	-khtml-user-select: none;
 	-webkit-user-select: none;
 	-o-user-select: none;
+	background: url("Images/transparentIndicator-no.png") repeat;
 }
 
 #canvas-base div#viewport {

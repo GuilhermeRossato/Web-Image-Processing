@@ -26,7 +26,13 @@ function createWrapperForObject(element) {
 				}
 			}
 		},
-		getChildrenByTagName(tagName) {
+		getLabel: function() {
+			if (this._real_element instanceof HTMLInputElement && this._real_element.type == "button")
+				return this._real_element.value;
+			else
+				return this._real_element.innerText;
+		},
+		getChildrenByTagName: function(tagName) {
 			tagName = tagName.toUpperCase();
 			return this.getChildren().filter(elem => (elem.getTagName().toUpperCase() === tagName));
 		},

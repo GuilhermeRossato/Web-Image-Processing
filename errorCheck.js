@@ -40,9 +40,13 @@ function checkErrorMessages() {
 		application.state = "error-permanent";
 		return;
 	}
-
-	appLoader.state = "init";
-	onImageSelect(lastLoadedImage) // debug;
+	if (true) {
+		/* DEBUG MODE */
+		appLoader.state = "init";
+		onImageSelect(lastLoadedImage)
+	} else {
+		appLoader.state = "init";
+	}
 }
 
 window.addEventListener("load", checkErrorMessages);

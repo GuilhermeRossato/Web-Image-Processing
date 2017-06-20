@@ -35,25 +35,30 @@
 						</div>
 						<div id="method-list">
 							<h4>Métodos</h4>
-							<input type="button" value="Vizinho mais próximo" disabled/>
+							<input type="button" value="Nenhum Método" disabled/>
+							<div class="separator"></div>
+							<input type="button" value="Vizinho mais próximo"/>
 							<div class="separator"></div>
 							<input type="button" value="Bilinear"/>
-							<div class="separator"></div>
-							<input type="button" value="Bicúbico"/>
-							<div class="separator"></div>
-							<input type="button" value="Biquartico"/>
 							<div class="separator"></div>
 						</div>
 						<div id="size-list">
 							<h4>Tamanhos</h4>
+							<input type="button" value="x 100%"/>
+							<input type="button" value="y 100%"/>
 							<input type="button" value="100%" disabled/>
-							<div class="separator"></div>
+							<input type="button" value="x 150%"/>
+							<input type="button" value="y 150%"/>
 							<input type="button" value="150%"/>
-							<div class="separator"></div>
-							<input type="button" value="200%"/>
-							<div class="separator"></div>
+							<input type="button" value="x 300%"/>
+							<input type="button" value="y 300%"/>
+							<input type="button" value="300%"/>
+							<input type="button" value="x 500%"/>
+							<input type="button" value="y 500%"/>
 							<input type="button" value="500%"/>
-							<div class="separator"></div>
+							<input type="button" value="x 800%"/>
+							<input type="button" value="y 800%"/>
+							<input type="button" value="800%"/>
 						</div>
 						<div id="magnifier-wrapper">
 							<h4>Mouse Pixels</h4>
@@ -100,9 +105,12 @@
 		<div id="catch-panning" class="mouse-catch" style="display: none" onmousedown="(event.preventDefault && event.preventDefault()); return false"></div>
 		<script src="Classes/DigitalImage.js"></script>
 		<script src="https://rawgit.com/GuilhermeRossato/Interpolation-Modules/master/FastInterpolation.js"></script>
-		<script src="Classes/PixelArea.js"></script>
+		<script src="Classes/PixelData.js"></script>
 		<script src="Classes/GraphicalUserInterface.js"></script>
 		<script src="Classes/StateMachine.js"></script>
+		<script src="Modulos/Zoom/ZoomController.js"></script>
+		<script src="Modulos/Zoom/Bilinear.js"></script>
+		<script src="Modulos/Zoom/NearestNeighboor.js"></script>
 		<script src="simplifier.js"></script>
 		<script src="fileSelect.js"></script>
 		<script src="errorCheck.js"></script>
