@@ -136,7 +136,7 @@ function getElement(identity) {
 				return addLookupForObject(element, createWrapperForObject(element));
 			}
 		} else {
-			console.warn(`Element of id "${identity}" was not found`);
+			console.error(`Element of id "${identity}" was not found`);
 		}
 	} else {
 		return console.error(`Unhandled parameter type: ${typeof(name)}`);
