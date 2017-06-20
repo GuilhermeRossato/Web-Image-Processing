@@ -379,7 +379,8 @@ span.selectable {
 	font-size: 10px;
 	text-align:center;
 	width:100%;
-	bottom:20px;
+	bottom: 0px;
+	padding: 1px 0px;
 	left:0;
 	background-color:#E0E0E0;
 }
