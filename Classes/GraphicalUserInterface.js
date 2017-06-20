@@ -361,6 +361,7 @@ GraphicalUserInterface.prototype = {
 	},
 	/* Structure and State events */
 	onChangeImage: function(image) {
+		window.img = image;
 		this.image = new DigitalImage(this.operation.elements.canvas, image, image.width, image.height);
 		this.operation.elements.title.getChildren(0).setContent(`${image.fileName} (${bytesToString(image.size)}) (${separateDigits((image.width*image.height).toString())} pixels)`);
 		this.updateImageSize();

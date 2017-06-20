@@ -14,7 +14,7 @@ const ZoomController = (function() {
 				zoomObject = undefined;
 			} else if (name === "vizinho mais próximo") {
 				zoomObject = NearestNeighboor;
-			} else if (name === "bilinear") {
+			} else if (name === "distancia quadrada") {
 				zoomObject = Bilinear;
 			} else {
 				console.error(`Unhandled zoom mode: "${name}"`);
