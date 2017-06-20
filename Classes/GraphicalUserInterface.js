@@ -42,6 +42,18 @@ function GraphicalUserInterface() {
 			event: function() {
 				this.stopDraggingScreen();
 			}
+		}, {
+			last: "idle",
+			next: "resizing",
+			event: function() {
+				this.startResizing();
+			}
+		}, {
+			last: "resizing",
+			next: "idle",
+			event: function() {
+				this.stopResizing();
+			}
 		}]
 	});
 }
@@ -74,9 +86,35 @@ GraphicalUserInterface.prototype = {
 		this.updateMagnifier(canvas, event.clientX-this.offsetX, event.clientY-this.offsetY);
 	},
 	onPanningMouseMove: function(event) {
-		this.offsetX = this.startPanning.offsetX + (event.clientX - this.startPanning.mouseX);
-		this.offsetY = this.startPanning.offsetY + (event.clientY - this.startPanning.mouseY);
+		this.offsetX = this.startCatch.offsetX + (event.clientX - this.startCatch.mouseX);
+		this.offsetY = this.startCatch.offsetY + (event.clientY - this.startCatch.mouseY);
 		this.updateOffset();
+	},
+	onResizeMouseMove: function(event) {
+		let newWidth, newHeight;
+		let distX = (event.clientX - this.startCatch.mouseX), distY = (event.clientY - this.startCatch.mouseY);
+		if (this.resizeIndex === 0) {
+			this.offsetY = this.startCatch.offsetY + distY;
+			this.updateOffset();
+			newHeight = this.startCatch.cHeight - distY;
+		} else if (this.resizeIndex === 4) {
+			newHeight = this.startCatch.cHeight + distY;
+		} else if (this.resizeIndex === 2 && this.toolsSide === "left") {
+			newWidth = this.startCatch.cWidth + distX;
+		} else if (this.resizeIndex === 2 && this.toolsSide === "right") {
+			this.offsetX = this.startCatch.offsetX + distX;
+			this.updateOffset();
+			newWidth = this.startCatch.cWidth - distX;
+		} else if (this.resizeIndex === 3 && this.toolsSide === "left") {
+			newWidth = this.startCatch.cWidth + distX;
+			newHeight = this.startCatch.cHeight + distY;
+		}
+		if (newWidth != undefined && newHeight != undefined)
+			this.image.setCanvasSize(newWidth, newHeight);
+		else if (newWidth != undefined)
+			this.image.setCanvasSize(newWidth, this.startCatch.cHeight);
+		else if (newHeight != undefined)
+			this.image.setCanvasSize(this.startCatch.cWidth, newHeight);
 	},
 	onMainMouseDown: function(event) {
 		if (event.type === "touchstart") {
@@ -85,15 +123,28 @@ GraphicalUserInterface.prototype = {
 			this.lastGlobalX = event.clientX;
 			this.lastGlobalY = event.clientY;
 			event.preventDefault();
-		}
-		console.log(event.type, event.clientX, event.clientY);
+		} else if (event.button !== 0)
+			return;
+	//console.log(event.type, event.clientX, event.clientY);
 		if (this.state === "idle") {
 			let rx = event.clientX - this.offsetX;
 			let ry = event.clientY - this.offsetY;
 			let width = this.realCanvasWidth;
 			let height = this.realCanvasHeight;
-			if (rx > 1 && ry > 1 && rx < width-1 && ry < height-1) {
+			let positionArgs;
+			if (this.toolsSide === "right") {
+				positionArgs = [[(width - 15) / 2, -15], [-15, -15], [-15, (height - 15)/2], [-15, (height - 15)], [(width - 15)/2, (height - 15)]];
+			} else {
+				positionArgs = [[(width - 15) / 2, -15], [(width - 15), -15], [(width - 15), (height - 15) / 2], [(width - 15), (height - 15)], [(width - 15) / 2, (height - 15)]];
+			}
+			let index;
+			if (positionArgs.some((pos, i) => (rx > pos[0] && ry > pos[1] && rx < pos[0]+30 && ry < pos[1]+30) && ((index = i) || true))) {
+				this.resizeIndex = index;
+				this.state = "resizing";
+				(window.getSelection && window.getSelection().empty());
+			} else if (rx > 1 && ry > 1 && rx < width-1 && ry < height-1) {
 				this.state = "panning-click";
+				(window.getSelection && window.getSelection().empty());
 			}
 		}
 	},
@@ -103,9 +154,11 @@ GraphicalUserInterface.prototype = {
 			event.clientY = event.touches[0].clientY;
 			event.preventDefault();
 		}
-		//console.log(event.type, event.clientX, event.clientY);
+	//console.log(event.type, event.clientX, event.clientY);
 		if (this.state === "panning" || this.state === "panning-click") {
 			this.onPanningMouseMove(event);
+		} else if (this.state === "resizing") {
+			this.onResizeMouseMove(event);
 		} else {
 			this.lastGlobalX = event.clientX;
 			this.lastGlobalY = event.clientY;
@@ -115,7 +168,7 @@ GraphicalUserInterface.prototype = {
 		if (event.type === "touchend") {
 			event.preventDefault();
 		}
-		if (this.state === "panning-click") {
+		if (this.state === "panning-click" || this.state === "resizing") {
 			this.state = "idle";
 		}
 	},
@@ -142,8 +195,8 @@ GraphicalUserInterface.prototype = {
 		this.operation.elements.viewport.setPosition(this.offsetX, this.offsetY);
 	},
 	updateToolSide: function() {
-		let width = this.image.width - 15;
-		let height = this.image.height - 15;
+		let width = this.realCanvasWidth - 15;
+		let height = this.realCanvasHeight - 15;
 		let scalers = this.operation.buttons.scalers;
 		let transformList;
 		let positionArgs;
@@ -193,34 +246,57 @@ GraphicalUserInterface.prototype = {
 		this.operation.elements.magnifierCanvas.render(ctx => ctx.putImageData(data, 0, 0, ));
 	},
 	startDraggingScreen: function() {
-		if (this.draggingScreen)
+		if (this.draggingScreen) {
+			console.warn("Unexpected function call");
 			return
-		this.startPanning = {
+		}
+		this.draggingScreen = true;
+		this.startCatch = {
 			mouseX : this.lastGlobalX,
 			mouseY : this.lastGlobalY,
 			offsetX : this.offsetX,
 			offsetY : this.offsetY
 		}
-		this.draggingScreen = true;
 		this.operation.elements.catchPanning.show();
 		this.operation.elements.catchPanning.setStyleAttribute("cursor", "move");
 	},
 	stopDraggingScreen: function() {
-		if (!this.draggingScreen)
+		if (!this.draggingScreen) {
+			console.warn("Unexpected function call");
 			return
+		}
 		this.draggingScreen = false;
 		this.operation.elements.catchPanning.hide();
 	},
+	startResizing: function() {
+		this.startCatch = {
+			mouseX : this.lastGlobalX,
+			mouseY : this.lastGlobalY,
+			offsetX : this.offsetX,
+			offsetY : this.offsetY,
+			cWidth : this.realCanvasWidth,
+			cHeight : this.realCanvasHeight
+		}
+		this.operation.elements.catchPanning.show();
+		this.operation.elements.catchPanning.setStyleAttribute("cursor", "move");
+	},
+	stopResizing: function() {
+		this.operation.elements.catchPanning.hide();
+	},
 	startFollowingMouse: function() {
-		if (this.magnifierFollowMouse)
+		if (this.magnifierFollowMouse) {
+			console.warn("Unexpected function call");
 			return
+		}
 		this.magnifierFollowMouse = true;
 		this.operation.elements.magnifierWrapper.setStyleAttribute("position", "absolute");
 		this.updateMagnifier(this.operation.elements.canvas, this.lastMouseX, this.lastMouseY);
 	},
 	stopFollowingMouse: function() {
-		if (!this.magnifierFollowMouse)
+		if (!this.magnifierFollowMouse) {
+			console.warn("Unexpected function call");
 			return
+		}
 		this.magnifierFollowMouse = false;
 		this.operation.elements.magnifierWrapper.setStyleAttribute("position", "inherit");
 		this.operation.elements.magnifierWrapper.setPosition(0, 0);
@@ -261,10 +337,6 @@ GraphicalUserInterface.prototype = {
 				magnifierCanvas: getElement("magnifier-canvas")
 			},
 			buttons: {
-				topScroll: getElement("top-scroll"),
-				rightScroll: getElement("right-scroll"),
-				bottomScroll: getElement("bottom-scroll"),
-				leftScroll: getElement("left-scroll"),
 				switch: getElement("button-switch"),
 				methods: getElement("method-list").getChildrenByTagName("input").filter(btn => btn.getType() === "button"),
 				sizes: getElement("size-list").getChildrenByTagName("input").filter(btn => btn.getType() === "button"),
