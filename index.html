@@ -45,7 +45,7 @@
 							<div class="separator"></div>
 						</div>
 						<div id="size-list">
-							<h4>Tamanhos Definidos</h4>
+							<h4>Tamanhos</h4>
 							<input type="button" value="100%" disabled/>
 							<div class="separator"></div>
 							<input type="button" value="150%"/>
@@ -97,7 +97,7 @@
 			</div>
 		</div>
 		<div id="disclaimer">Este aplicativo foi desenvolvido para a disciplina de Métodos Computacionais por Guilherme Rossato em Junho de 2017</div>
-		<div id="catch-panning" class="mouse-catch" style="display: none"></div>
+		<div id="catch-panning" class="mouse-catch" style="display: none" onmousedown="(event.preventDefault && event.preventDefault()); return false"></div>
 		<script src="Classes/DigitalImage.js"></script>
 		<script src="https://rawgit.com/GuilhermeRossato/Interpolation-Modules/master/FastInterpolation.js"></script>
 		<script src="Classes/PixelArea.js"></script>
