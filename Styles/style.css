@@ -210,7 +210,7 @@ span.selectable {
 
 #canvas-base #size-list input[type="button"] {
 	display: inline-block;
-	width: 56px;
+	width: 87px;
 	margin: 0 0 10px 0px;
 	padding: 2px;
 }
@@ -233,8 +233,8 @@ span.selectable {
 }
 
 #canvas-base .scaler-button {
-	width:30px;
-	height:30px;
+	width: 20px;
+	height: 20px;
 	font-size:30px;
 	position:relative;
 	z-index:5;
@@ -310,7 +310,7 @@ span.selectable {
 	-khtml-user-select: none;
 	-webkit-user-select: none;
 	-o-user-select: none;
-	background: url("Images/transparentIndicator-no.png") repeat;
+	/*background: url("Images/transparentIndicator.png") repeat;*/
 }
 
 #canvas-base div#viewport {

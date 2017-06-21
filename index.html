@@ -4,7 +4,7 @@
 		<title>Digital Zoom - Guilherme Rossato</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link href="style.css" rel="stylesheet">
+		<link href="Styles/style.css" rel="stylesheet">
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	</head>
 	<body style="background-color:#EEE;color:#333;width:100vw;height:100vh;margin:0px;padding:0px;overflow:hidden;cursor:default;">
@@ -39,6 +39,8 @@
 							<div class="separator"></div>
 							<input type="button" value="Vizinho mais próximo"/>
 							<div class="separator"></div>
+							<input type="button" value="Bilinear"/>
+							<div class="separator"></div>
 							<input type="button" value="Distancia Quadrada"/>
 							<div class="separator"></div>
 						</div>
@@ -46,19 +48,14 @@
 							<h4>Tamanhos</h4>
 							<input type="button" value="x 100%"/>
 							<input type="button" value="y 100%"/>
-							<input type="button" value="100%" disabled/>
 							<input type="button" value="x 150%"/>
 							<input type="button" value="y 150%"/>
-							<input type="button" value="150%"/>
 							<input type="button" value="x 300%"/>
 							<input type="button" value="y 300%"/>
-							<input type="button" value="300%"/>
 							<input type="button" value="x 500%"/>
 							<input type="button" value="y 500%"/>
-							<input type="button" value="500%"/>
 							<input type="button" value="x 800%"/>
 							<input type="button" value="y 800%"/>
-							<input type="button" value="800%"/>
 						</div>
 						<div id="magnifier-wrapper">
 							<h4>Mouse Pixels</h4>
@@ -104,17 +101,18 @@
 		<div id="disclaimer">Este aplicativo foi desenvolvido para a disciplina de Métodos Computacionais por Guilherme Rossato em Junho de 2017</div>
 		<div id="catch-panning" class="mouse-catch" style="display: none" onmousedown="(event.preventDefault && event.preventDefault()); return false"></div>
 		<script src="Classes/DigitalImage.js"></script>
-		<script src="https://rawgit.com/GuilhermeRossato/Interpolation-Modules/master/FastInterpolation.js"></script>
 		<script src="Classes/PixelData.js"></script>
 		<script src="Classes/GraphicalUserInterface.js"></script>
 		<script src="Classes/StateMachine.js"></script>
-		<script src="Modulos/Zoom/ZoomController.js"></script>
-		<script src="Modulos/Zoom/Bilinear.js"></script>
-		<script src="Modulos/Zoom/NearestNeighboor.js"></script>
-		<script src="simplifier.js"></script>
-		<script src="fileSelect.js"></script>
-		<script src="errorCheck.js"></script>
-		<script src="cachedImage.js"></script>
-		<script src="script.js"></script>
+		<script src="Modules/ZoomController.js"></script>
+		<script src="Interpolation/Interpolation.js"></script>
+		<script src="Interpolation/Bilinear.js"></script>
+		<script src="Interpolation/SquaredDistance.js"></script>
+		<script src="Interpolation/NearestNeighboor.js"></script>
+		<script src="Scripts/simplifier.js"></script>
+		<script src="Scripts/fileSelect.js"></script>
+		<script src="Scripts/errorCheck.js"></script>
+		<script src="Scripts/cachedImage.js"></script>
+		<script src="Scripts/script.js"></script>
 	</body>
 </html>

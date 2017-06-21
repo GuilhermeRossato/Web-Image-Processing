@@ -1,4 +1,4 @@
-const Bilinear = new ZoomMethod({
+const SquaredDistance = new ZoomMethod({
 	process: function(origin, target) {
 		/* Cria funções de apoio baseado no tamanho das imagens */
 		var translateToOrigin = this.generateTranslateToOrigin(origin, target);
