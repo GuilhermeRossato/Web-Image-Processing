@@ -7,7 +7,10 @@ const Bilinear = new ZoomMethod({
 		var ox, oy, quad, squaredSum, pixel, weight, r, g, b, a, red, green, blue, alpha;
 		/* Declara uma função de apoio */
 		function distanceSquared(x0, y0, x1, y1) {
-			return (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1);
+			var res = (x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1);
+			if (res === 0)
+				res = 0.0001;
+			return res;
 		}
 		/* Faz uma iteração para cada pixel do novo tamanho */
 		for (var y = 0; y < target.height; y++) {
