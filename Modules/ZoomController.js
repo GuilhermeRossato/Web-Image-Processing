@@ -17,7 +17,7 @@ const ZoomController = (function() {
 			} else if (name === "bilinear") {
 				zoomObject = Bilinear;
 			} else if (name === "distancia quadrada") {
-				zoomObject = Bilinear;
+				zoomObject = SquaredDistance;
 			} else {
 				console.error(`Unhandled zoom mode: "${name}"`);
 			}

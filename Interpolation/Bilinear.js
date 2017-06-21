@@ -88,14 +88,6 @@ const Bilinear = new ZoomMethod({
 				x: Math.floor(x),
 				y: Math.round(y)
 			};
-			(top.x < 0) && (top.x = 0);
-			(right.x < 0) && (right.x = 0);
-			(bottom.x < 0) && (bottom.x = 0);
-			(left.x < 0) && (left.x = 0);
-			(top.y < 0) && (top.y = 0);
-			(right.y < 0) && (right.y = 0);
-			(bottom.y < 0) && (bottom.y = 0);
-			(left.y < 0) && (left.y = 0);
 			return [top, right, bottom, left];
 		}
 	}
