@@ -17,23 +17,23 @@
  */
 
 const Interpolation = (function() {
-	let linear = function(x0, y0, x1, y1, x) {
+	var linear = function(x0, y0, x1, y1, x) {
 		// (verbose): return b(y0, y1, ib(x0, x1, x))
 		return (x * y0 - x1 * y0 - x * y1 + x0 * y1) / (x0 - x1);
 	}
-	let quadratic = function(x0, y0, x1, y1, x2, y2, x) {
+	var quadratic = function(x0, y0, x1, y1, x2, y2, x) {
 		// (verbose): return b(b(y0, y1, ib(x0, x1, x)), b(y1, y2, ib(x1, x2, x)), ib(x0, x2, x))
 		// (raw)	: return (x*x*x1*y0-x*x1*x1*y0-x*x*x2*y0+x1*x1*x2*y0+x*x2*x2*y0-x1*x2*x2*y0-x*x*x0*y1+x*x0*x0*y1+x*x*x2*y1-x0*x0*x2*y1-x*x2*x2*y1+x0*x2*x2*y1+x*x*x0*y2-x*x0*x0*y2-x*x*x1*y2+x0*x0*x1*y2+x*x1*x1*y2-x0*x1*x1*y2)/(x0*x0*x1-x0*x1*x1-x0*x0*x2+x1*x1*x2+x0*x2*x2-x1*x2*x2);
-		let x_2 = x * x
+		var x_2 = x * x
 		  , x0_2 = x0 * x0
 		  , x1_2 = x1 * x1
 		  , x2_2 = x2 * x2;
 		return (x_2*x1*y0-x*x1_2*y0-x_2*x2*y0+x1_2*x2*y0+x*x2_2*y0-x1*x2_2*y0-x_2*x0*y1+x*x0_2*y1+x_2*x2*y1-x0_2*x2*y1-x*x2_2*y1+x0*x2_2*y1+x_2*x0*y2-x*x0_2*y2-x_2*x1*y2+x0_2*x1*y2+x*x1_2*y2-x0*x1_2*y2)/(x0_2*x1-x0*x1*x1-x0_2*x2+x1_2*x2+x0*x2_2-x1*x2_2);
 	}
-	let cubic = function(x0, y0, x1, y1, x2, y2, x3, y3, x) {
+	var cubic = function(x0, y0, x1, y1, x2, y2, x3, y3, x) {
 		// (verbose): return b(b(b(y0, y1, ib(x0, x1, x)), b(y1, y2, ib(x1, x2, x)), ib(x0, x2, x)),b(b(y1, y2, ib(x1, x2, x)), b(y2, y3, ib(x2, x3, x)), ib(x1, x3, x)),ib(x0, x3, x))
 		// (raw)	: return (x*x*x*x1*x1*x2*y0-x*x*x1*x1*x1*x2*y0-x*x*x*x1*x2*x2*y0+x*x1*x1*x1*x2*x2*y0+x*x*x1*x2*x2*x2*y0-x*x1*x1*x2*x2*x2*y0-x*x*x*x1*x1*x3*y0+x*x*x1*x1*x1*x3*y0+x*x*x*x2*x2*x3*y0-x1*x1*x1*x2*x2*x3*y0-x*x*x2*x2*x2*x3*y0+x1*x1*x2*x2*x2*x3*y0+x*x*x*x1*x3*x3*y0-x*x1*x1*x1*x3*x3*y0-x*x*x*x2*x3*x3*y0+x1*x1*x1*x2*x3*x3*y0+x*x2*x2*x2*x3*x3*y0-x1*x2*x2*x2*x3*x3*y0-x*x*x1*x3*x3*x3*y0+x*x1*x1*x3*x3*x3*y0+x*x*x2*x3*x3*x3*y0-x1*x1*x2*x3*x3*x3*y0-x*x2*x2*x3*x3*x3*y0+x1*x2*x2*x3*x3*x3*y0-x*x*x*x0*x0*x2*y1+x*x*x0*x0*x0*x2*y1+x*x*x*x0*x2*x2*y1-x*x0*x0*x0*x2*x2*y1-x*x*x0*x2*x2*x2*y1+x*x0*x0*x2*x2*x2*y1+x*x*x*x0*x0*x3*y1-x*x*x0*x0*x0*x3*y1-x*x*x*x2*x2*x3*y1+x0*x0*x0*x2*x2*x3*y1+x*x*x2*x2*x2*x3*y1-x0*x0*x2*x2*x2*x3*y1-x*x*x*x0*x3*x3*y1+x*x0*x0*x0*x3*x3*y1+x*x*x*x2*x3*x3*y1-x0*x0*x0*x2*x3*x3*y1-x*x2*x2*x2*x3*x3*y1+x0*x2*x2*x2*x3*x3*y1+x*x*x0*x3*x3*x3*y1-x*x0*x0*x3*x3*x3*y1-x*x*x2*x3*x3*x3*y1+x0*x0*x2*x3*x3*x3*y1+x*x2*x2*x3*x3*x3*y1-x0*x2*x2*x3*x3*x3*y1+x*x*x*x0*x0*x1*y2-x*x*x0*x0*x0*x1*y2-x*x*x*x0*x1*x1*y2+x*x0*x0*x0*x1*x1*y2+x*x*x0*x1*x1*x1*y2-x*x0*x0*x1*x1*x1*y2-x*x*x*x0*x0*x3*y2+x*x*x0*x0*x0*x3*y2+x*x*x*x1*x1*x3*y2-x0*x0*x0*x1*x1*x3*y2-x*x*x1*x1*x1*x3*y2+x0*x0*x1*x1*x1*x3*y2+x*x*x*x0*x3*x3*y2-x*x0*x0*x0*x3*x3*y2-x*x*x*x1*x3*x3*y2+x0*x0*x0*x1*x3*x3*y2+x*x1*x1*x1*x3*x3*y2-x0*x1*x1*x1*x3*x3*y2-x*x*x0*x3*x3*x3*y2+x*x0*x0*x3*x3*x3*y2+x*x*x1*x3*x3*x3*y2-x0*x0*x1*x3*x3*x3*y2-x*x1*x1*x3*x3*x3*y2+x0*x1*x1*x3*x3*x3*y2-x*x*x*x0*x0*x1*y3+x*x*x0*x0*x0*x1*y3+x*x*x*x0*x1*x1*y3-x*x0*x0*x0*x1*x1*y3-x*x*x0*x1*x1*x1*y3+x*x0*x0*x1*x1*x1*y3+x*x*x*x0*x0*x2*y3-x*x*x0*x0*x0*x2*y3-x*x*x*x1*x1*x2*y3+x0*x0*x0*x1*x1*x2*y3+x*x*x1*x1*x1*x2*y3-x0*x0*x1*x1*x1*x2*y3-x*x*x*x0*x2*x2*y3+x*x0*x0*x0*x2*x2*y3+x*x*x*x1*x2*x2*y3-x0*x0*x0*x1*x2*x2*y3-x*x1*x1*x1*x2*x2*y3+x0*x1*x1*x1*x2*x2*y3+x*x*x0*x2*x2*x2*y3-x*x0*x0*x2*x2*x2*y3-x*x*x1*x2*x2*x2*y3+x0*x0*x1*x2*x2*x2*y3+x*x1*x1*x2*x2*x2*y3-x0*x1*x1*x2*x2*x2*y3)/(x0*x0*x0*x1*x1*x2-x0*x0*x1*x1*x1*x2-x0*x0*x0*x1*x2*x2+x0*x1*x1*x1*x2*x2+x0*x0*x1*x2*x2*x2-x0*x1*x1*x2*x2*x2-x0*x0*x0*x1*x1*x3+x0*x0*x1*x1*x1*x3+x0*x0*x0*x2*x2*x3-x1*x1*x1*x2*x2*x3-x0*x0*x2*x2*x2*x3+x1*x1*x2*x2*x2*x3+x0*x0*x0*x1*x3*x3-x0*x1*x1*x1*x3*x3-x0*x0*x0*x2*x3*x3+x1*x1*x1*x2*x3*x3+x0*x2*x2*x2*x3*x3-x1*x2*x2*x2*x3*x3-x0*x0*x1*x3*x3*x3+x0*x1*x1*x3*x3*x3+x0*x0*x2*x3*x3*x3-x1*x1*x2*x3*x3*x3-x0*x2*x2*x3*x3*x3+x1*x2*x2*x3*x3*x3)
-		let x_2 = x * x
+		var x_2 = x * x
 		  , x_3 = x_2 * x
 		  ,	x0_2 = x0 * x0
 		  , x0_3 = x0_2 * x0

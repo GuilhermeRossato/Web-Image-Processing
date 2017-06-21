@@ -1,9 +1,9 @@
 const ZoomController = (function() {
-	let zoomObject;
+	var zoomObject;
 	return {
 		applyZoom: function(image, width, height) {
 			if (zoomObject instanceof ZoomMethod && (width > image.width || height > image.height)) {
-				let imageData = new ImageData(width, height);
+				var imageData = new ImageData(width, height);
 				zoomObject.process(image.pixelData, new PixelData(imageData));
 				image.putImageData(imageData);
 			}
